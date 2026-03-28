@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart Campus Registration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #eaf6ff, #f5faff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      max-width: 850px;
+      width: 95%;
+    }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header img { max-height: 80px; }
+    .header h1 { font-size: 30px; color: #004a7c; margin-top: 10px; }
+    .role-buttons { text-align: center; margin: 20px 0; }
+    .role-buttons button {
+      padding: 10px 20px;
+      margin: 0 5px;
+      border: none;
+      border-radius: 20px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #cce4f6;
+      color: #004a7c;
+      transition: all 0.3s ease;
+    }
+    .role-buttons button.active {
+      background: #f9c421;
+      color: #004a7c;
+      pointer-events: none;
+    }
+    h2 {
+      margin-top: 30px;
+      margin-bottom: 10px;
+      color: #004a7c;
+      font-size: 20px;
+      border-bottom: 2px solid #f9c421;
+      padding-bottom: 5px;
+    }
+    label { display: block; margin-top: 15px; font-weight: 600; color: #004a7c; }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 5px;
+      border: 2px solid #cce4f6;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: border-color 0.3s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #004a7c; outline: none; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    textarea { resize: vertical; min-height: 80px; }
+    .submit-btn {
+      background-color: #f9c421;
+      color: #004a7c;
+      font-weight: bold;
+      font-size: 16px;
+      padding: 14px;
+      margin-top: 30px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .submit-btn:hover { background-color: #e5ae00; }
+    @media (max-width: 600px) { .container { padding: 25px; } }
+    .error { color: red; font-size: 14px; }
+    .blurred { filter: blur(5px); pointer-events: none; }
+    #successOverlay {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    #successBox {
+      background: #d4edda;
+      color: #155724;
+      padding: 30px 40px;
+      border-radius: 10px;
+      font-size: 18px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="../assets/img/logo123.png" alt="Smart Campus Logo">
+      <h1>Smart Campus Registration</h1>
+    </div>
+
+    <div id="messageBox"></div>
+
+    <div class="role-buttons">
+      <button id="studentBtn" class="active" onclick="switchForm('student')">Student</button>
+      <button id="facultyBtn" onclick="switchForm('faculty')">Faculty</button>
+    </div>
+
+    <!-- STUDENT FORM -->
+    <form id="studentForm" action="student-register.php" method="post" enctype="multipart/form-data">
+      <h2>Personal Information</h2>
+      <div class="grid-2">
+        <div>
+          <label for="studentFirstname">First Name</label>
+          <input type="text" id="studentFirstname" name="firstname" required>
+        </div>
+        <div>
+          <label for="studentLastname">Last Name</label>
+          <input type="text" id="studentLastname" name="lastname" required>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label for="studentFathername">Father's Name</label>
+          <input type="text" id="studentFathername" name="fathername" required>
+        </div>
+        <div>
+          <label for="studentMothername">Mother's Name</label>
+          <input type="text" id="studentMothername" name="mothername" required>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label for="studentDob">Date of Birth</label>
+          <input type="date" id="studentDob" name="dob" required>
+        </div>
+        <div>
+          <label for="studentGender">Gender</label>
+          <select id="studentGender" name="gender" required>
+            <option value="">--Select--</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label for="studentEmail">Email</label>
+          <input type="email" id="studentEmail" name="email" required>
+          <span id="studentEmailError" class="error"></span>
+        </div>
+        <div>
+          <label for="studentAadhaar">Aadhaar Number</label>
+          <input type="text" id="studentAadhaar" name="aadhaar" maxlength="12" required>
+          <span id="studentAadhaarError" class="error"></span>
+        </div>
+      </div>
+      <label for="studentAddress">Address</label>
+      <textarea id="studentAddress" name="address" required></textarea>
+      <div class="grid-2">
+        <div>
+          <label for="studentCity">City</label>
+          <input type="text" id="studentCity" name="city" required>
+        </div>
+        <div>
+          <label for="studentDistrict">District</label>
+          <input type="text" id="studentDistrict" name="district" required>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label for="studentState">State</label>
+          <input type="text" id="studentState" name="state" required>
+        </div>
+        <div>
+          <label for="studentNation">Nation</label>
+          <input type="text" id="studentNation" name="nation" required>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label for="studentPhoto">Upload Photo</label>
+          <input type="file" id="studentPhoto" name="photo" accept="image/*" required>
+        </div>
+        <div>
+          <label for="studentPhone">Phone Number</label>
+          <input type="tel" id="studentPhone" name="phone" maxlength="10" required>
+          <span id="studentPhoneError" class="error"></span>
+        </div>
+      </div>
+
+      <h2>Academic Information</h2>
+      <div class="grid-2">
+        <div>
+          <label for="program">Program Enrolled</label>
+          <select id="program" name="program" required>
+            <option value="">--Select--</option>
+            <option value="B.Tech">B.Tech</option>
+            <option value="B.Sc">B.Sc</option>
+            <option value="BBA">BBA</option>
+            <option value="MBA">MBA</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="department">Department</label>
+          <select id="department" name="department" required>
+            <option value="">--Select Department--</option>
+            <option>Computer Science</option>
+            <option>Electronics</option>
+            <option>Mechanical</option>
+            <option>Civil</option>
+            <option>Mathematics</option>
+            <option>Physics</option>
+            <option>Chemistry</option>
+            <option>Management</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label for="year">Year of Study</label>
+          <select id="year" name="year" required>
+            <option value="">--Select--</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+          </select>
+        </div>
+        <div>
+          <label for="semester">Semester</label>
+          <select id="semester" name="semester" required>
+            <option value="">--Select Semester--</option>
+            <option value="Semester 1">Semester 1</option>
+            <option value="Semester 2">Semester 2</option>
+            <option value="Semester 3">Semester 3</option>
+            <option value="Semester 4">Semester 4</option>
+            <option value="Semester 5">Semester 5</option>
+            <option value="Semester 6">Semester 6</option>
+            <option value="Semester 7">Semester 7</option>
+            <option value="Semester 8">Semester 8</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="submit-btn" type="submit">Submit Registration</button>
+    </form>
+
+    <!-- FACULTY FORM -->
+    <form id="facultyForm" action="faculty-register.php" method="post" enctype="multipart/form-data" style="display:none;">
+      <h2> Personal Information</h2>
+      <div class="grid-2">
+        <div>
+          <label for="facultyFirstname">First Name</label>
+          <input type="text" id="facultyFirstname" name="fname" required>
+        </div>
+        <div>
+          <label for="facultyLastname">Last Name</label>
+          <input type="text" id="facultyLastname" name="lname" required>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label for="facultyEmail">Email</label>
+          <input type="email" id="facultyEmail" name="email" required>
+          <span id="facultyEmailError" class="error"></span>
+        </div>
+        <div>
+          <label for="facultyPhone">Phone Number</label>
+          <input type="tel" id="facultyPhone" name="phone" maxlength="10" required>
+          <span id="facultyPhoneError" class="error"></span>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label for="facultyDob">Date of Birth</label>
+          <input type="date" id="facultyDob" name="dob" required>
+        </div>
+        <div>
+          <label for="facultyGender">Gender</label>
+          <select id="facultyGender" name="gender" required>
+            <option value="">--Select--</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <label for="facultyAddress">Address</label>
+      <textarea id="facultyAddress" name="address" rows="3" required></textarea>
+
+      <h2> Professional Information</h2>
+      <div class="grid-2">
+        <div>
+          <label for="facultyDepartment">Department</label>
+          <select id="facultyDepartment" name="department" required>
+            <option value="">--Select Department--</option>
+            <option>Computer Science</option>
+            <option>Electronics</option>
+            <option>Mechanical</option>
+            <option>Civil</option>
+            <option>Mathematics</option>
+            <option>Physics</option>
+            <option>Chemistry</option>
+            <option>Management</option>
+          </select>
+        </div>
+        <div>
+          <label for="facultyDesignation">Designation</label>
+          <select id="facultyDesignation" name="designation" required>
+            <option value="">--Select Designation--</option>
+            <option>Professor</option>
+            <option>Associate Professor</option>
+            <option>Assistant Professor</option>
+            <option>Lecturer</option>
+            <option>Research Scholar</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label for="facultyQualification">Highest Qualification</label>
+          <select id="facultyQualification" name="qualification" required>
+            <option value="">--Select Qualification--</option>
+            <option>Ph.D</option>
+            <option>M.Tech/M.E</option>
+            <option>M.Sc</option>
+            <option>MBA</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="facultyExperience">Years of Experience</label>
+          <input type="number" id="facultyExperience" name="experience" min="0" required>
+        </div>
+      </div>
+
+      <h2> Identity Verification</h2>
+      <div class="grid-2">
+        <div>
+          <label for="facultyAadhaar">Aadhaar</label>
+          <input type="text" id="facultyAadhaar" name="aadhaar" maxlength="12">
+          <span id="facultyAadhaarError" class="error"></span>
+        </div>
+        <div>
+          <label for="facultyPan">PAN Number</label>
+          <input type="text" id="facultyPan" name="pan" maxlength="10" required>
+          <span id="facultyPanError" class="error"></span>
+        </div>
+      </div>
+
+      <h2> Upload Documents</h2>
+      <div class="grid-2">
+        <div>
+          <label for="facultyPhoto">Upload Photo</label>
+          <input type="file" id="facultyPhoto" name="photo" accept="image/*" required>
+        </div>
+        <div>
+          <label for="facultyResume">Upload Resume (PDF)</label>
+          <input type="file" id="facultyResume" name="resume" accept=".pdf" required>
+        </div>
+      </div>
+
+      <button class="submit-btn" type="submit">Submit Faculty Registration</button>
+    </form>
+  </div>
+
+  <script>
+    function switchForm(role) {
+      document.getElementById("studentForm").style.display = (role === 'student') ? "block" : "none";
+      document.getElementById("facultyForm").style.display = (role === 'faculty') ? "block" : "none";
+      document.getElementById("studentBtn").classList.toggle("active", role === 'student');
+      document.getElementById("facultyBtn").classList.toggle("active", role === 'faculty');
+    }
+  </script>
+
+  <!-- jQuery + Validation (unchanged, keeping your existing logic) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Keep your duplicate-checking + AJAX submit scripts here -->
+  <script>
+$(function () {
+
+  function showError(id, msg) { $("#" + id + "Error").text(msg); }
+  function clearError(id) { $("#" + id + "Error").text(''); }
+  
+  // === Duplicate check function ===
+  function checkDuplicate(type, field, value, errorId) {
+    if (value.trim() === "") return;
+    $.post("check-duplicate.php", { type, field, value }, function (res) {
+      if (res.status === "duplicate") {
+        showError(errorId, field.charAt(0).toUpperCase() + field.slice(1) + " already exists");
+      } else {
+        clearError(errorId);
+      }
+    }, "json");
+  }
+
+  // === Student form duplicate checks ===
+  $("#studentEmail").on("blur", function () {
+    checkDuplicate("student", "email", this.value, "studentEmail");
+  });
+  $("#studentAadhaar").on("blur", function () {
+    checkDuplicate("student", "aadhaar", this.value, "studentAadhaar");
+  });
+
+  // === Student form submit ===
+  $("#studentForm").on("submit", function (e) {
+    e.preventDefault();
+
+    let email = $("#studentEmail").val();
+    let aadhaar = $("#studentAadhaar").val();
+    let phone = $("#studentPhone").val();
+    let ok = true;
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError("studentEmail", "Invalid email"); ok = false; }
+    if (!/^\d{12}$/.test(aadhaar)) { showError("studentAadhaar", "Enter 12-digit Aadhaar"); ok = false; }
+    if (!/^\d{10}$/.test(phone)) { showError("studentPhone", "Enter 10-digit phone"); ok = false; }
+
+    if ($("#studentEmailError").text() !== "" || $("#studentAadhaarError").text() !== "") {
+      ok = false;
+    }
+    if (!ok) return;
+
+    let formData = new FormData(this);
+
+    $.ajax({
+      url: "student-register.php",
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function (res) {
+        let response = (typeof res === "string") ? JSON.parse(res) : res;
+
+        if (response.status === "success") {
+          $("body > *:not(#successOverlay)").addClass("blurred");
+          $("#successOverlay").css("display","flex").hide().fadeIn();
+
+          setTimeout(function () { window.location.href = "../home.php"; }, 3000);
+        } else {
+          if (response.field === "email") {
+            $("#studentEmailError").text(response.message);
+          } else if (response.field === "aadhaar") {
+            $("#studentAadhaarError").text(response.message);
+          } else {
+            $("#messageBox").html(
+              '<div style="padding:15px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; border-radius:5px;">' +
+              "❌ " + response.message +
+              "</div>"
+            );
+          }
+        }
+      },
+      error: function () {
+        alert("❌ Server error during student registration.");
+      }
+    });
+  });
+
+  // === Faculty form duplicate checks ===
+  $("#facultyEmail").on("blur", function () {
+    checkDuplicate("faculty", "email", this.value, "facultyEmail");
+  });
+  $("#facultyAadhaar").on("blur", function () {
+    if (this.value.trim() !== "") {
+      checkDuplicate("faculty", "aadhaar", this.value, "facultyAadhaar");
+    }
+  });
+
+  // === Faculty form submit ===
+  $("#facultyForm").on("submit", function (e) {
+    e.preventDefault();
+
+    let email = $("#facultyEmail").val();
+    let aadhaar = $("#facultyAadhaar").val();
+    let phone = $("#facultyPhone").val();
+    let pan = $("#facultyPan").val();
+    let ok = true;
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError("facultyEmail", "Invalid email"); ok = false; }
+    if (!/^\d{12}$/.test(aadhaar)) { showError("facultyAadhaar", "Enter 12-digit Aadhaar"); ok = false; }
+    if (!/^\d{10}$/.test(phone)) { showError("facultyPhone", "Enter 10-digit phone"); ok = false; }
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan)) { showError("facultyPan", "Invalid PAN"); ok = false; }
+
+    if ($("#facultyEmailError").text() !== "" || $("#facultyAadhaarError").text() !== "") {
+      ok = false;
+    }
+    if (!ok) return;
+
+    let formData = new FormData(this);
+
+    $.ajax({
+      url: "faculty-register.php",
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function (res) {
+        let response = (typeof res === "string") ? JSON.parse(res) : res;
+
+        if (response.status === "success") {
+          $("body > *:not(#successOverlay)").addClass("blurred");
+          $("#successOverlay").css("display","flex").hide().fadeIn();
+
+          setTimeout(function () { window.location.href = "../home.php"; }, 3000);
+        } else {
+          if (response.field === "email") {
+            $("#facultyEmailError").text(response.message);
+          } else if (response.field === "aadhaar") {
+            $("#facultyAadhaarError").text(response.message);
+          } else {
+            $("#messageBox").html(
+              '<div style="padding:15px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; border-radius:5px;">' +
+              "❌ " + response.message +
+              "</div>"
+            );
+          }
+        }
+      },
+      error: function () {
+        alert("❌ Server error during faculty registration.");
+      }
+    });
+  });
+
+});
+$(function () {
+
+  function showError(id, msg) { $("#" + id + "Error").text(msg); }
+  function clearError(id) { $("#" + id + "Error").text(''); }
+
+  // === Duplicate check function ===
+  function checkDuplicate(type, field, value, errorId) {
+    if (value.trim() === "") return;
+    $.post("check-duplicate.php", { type, field, value }, function (res) {
+      if (res.status === "duplicate") {
+        showError(errorId, field.charAt(0).toUpperCase() + field.slice(1) + " already exists");
+      } else {
+        clearError(errorId);
+      }
+    }, "json");
+  }
+
+  // === Faculty form duplicate checks ===
+  $("#facultyEmail").on("blur", function () {
+    checkDuplicate("faculty", "email", this.value, "facultyEmail");
+  });
+  $("#facultyAadhaar").on("blur", function () {
+    checkDuplicate("faculty", "aadhaar", this.value, "facultyAadhaar");
+  });
+  $("#facultyPhone").on("blur", function () {
+    checkDuplicate("faculty", "phone", this.value, "facultyPhone");
+  });
+  $("#facultyPan").on("blur", function () {
+    checkDuplicate("faculty", "pan", this.value, "facultyPan");
+  });
+
+  // === Faculty form submit ===
+  $("#facultyForm").on("submit", function (e) {
+    e.preventDefault();
+
+    let email = $("#facultyEmail").val();
+    let aadhaar = $("#facultyAadhaar").val();
+    let phone = $("#facultyPhone").val();
+    let pan = $("#facultyPan").val();
+    let ok = true;
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError("facultyEmail", "Invalid email"); ok = false; }
+    if (!/^\d{12}$/.test(aadhaar)) { showError("facultyAadhaar", "Enter 12-digit Aadhaar"); ok = false; }
+    if (!/^\d{10}$/.test(phone)) { showError("facultyPhone", "Enter 10-digit phone"); ok = false; }
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan)) { showError("facultyPan", "Invalid PAN"); ok = false; }
+
+    if ($("#facultyEmailError").text() !== "" || $("#facultyAadhaarError").text() !== "" || $("#facultyPhoneError").text() !== "" || $("#facultyPanError").text() !== "") {
+      ok = false;
+    }
+    if (!ok) return;
+
+    let formData = new FormData(this);
+
+    $.ajax({
+      url: "faculty-register.php",
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function (res) {
+        let response = (typeof res === "string") ? JSON.parse(res) : res;
+
+        if (response.status === "success") {
+          $("body > *:not(#successOverlay)").addClass("blurred");
+          $("#successOverlay").css("display","flex").hide().fadeIn();
+
+          setTimeout(function () { window.location.href = "../home.php"; }, 3000);
+        } else {
+          if (response.field) {
+            $("#" + response.field + "Error").text(response.message);
+          } else {
+            $("#messageBox").html(
+              '<div style="padding:15px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; border-radius:5px;">' +
+              "❌ " + response.message +
+              "</div>"
+            );
+          }
+        }
+      },
+      error: function () {
+        alert("❌ Server error during faculty registration.");
+      }
+    });
+  });
+
+});
+</script>
+  <div id="successOverlay">
+    <div id="successBox">
+      ✅ Registered successfully! <br> Redirecting...
+    </div>
+  </div>
+</body>
+</html>

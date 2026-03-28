@@ -1,0 +1,16 @@
+# Database config — never upload passwords
+assets/config/db-config.php
+assets/config/mail-config.php
+config/database.php
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# Node modules (if any)
+node_modules/
+
+# Environment files
+.env
