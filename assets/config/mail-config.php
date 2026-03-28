@@ -14,13 +14,13 @@ function sendEmail($to, $subject, $body) {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'smartcampus26@gmail.com';   // replace
-        $mail->Password   = 'paqk slnd ciwa sqkg';     // use Gmail app password
+        $mail->Username   = 'example@gmail.com';   // replace
+        $mail->Password   = 'passkey';     // use Gmail app password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
         // Recipients
-        $mail->setFrom('smartcampus26@gmail.com', 'Smart Campus');
+        $mail->setFrom('example@gmail.com', 'Smart Campus');
         $mail->addAddress($to);
 
         // Content
